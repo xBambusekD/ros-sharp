@@ -11,7 +11,6 @@ namespace RosSharp.Urdf.Runtime {
 
             urdfVisual.GeometryType = type;
             UrdfGeometryVisualRuntime.Create(visualObject.transform, type);
-            UnityEditor.EditorGUIUtility.PingObject(visualObject);
         }
 
         public static void Create(Transform parent, Link.Visual visual, bool useUrdfMaterials = false) {

@@ -24,7 +24,6 @@ namespace RosSharp.Urdf.Runtime {
             } else
                 UrdfGeometryCollisionRuntime.Create(collisionObject.transform, type);
 
-            UnityEditor.EditorGUIUtility.PingObject(collisionObject);
         }
 
         public static void Create(Transform parent, Link.Collision collision, Link.Visual visual = null) {
