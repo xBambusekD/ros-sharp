@@ -13,24 +13,19 @@ namespace RosSharp.Urdf.Runtime {
             UrdfGeometryVisualRuntime.Create(visualObject.transform, type);
         }
 
-        public static void Create(Transform parent, Link.Visual visual, bool useUrdfMaterials = false) {
+        public static void Create(Transform parent, Link.Visual visual, bool useColliderInVisuals = false, bool useUrdfMaterials = false) {
             GameObject visualObject = new GameObject(visual.name ?? "unnamed");
             visualObject.transform.SetParentAndAlign(parent);
             UrdfVisual urdfVisual = visualObject.AddComponent<UrdfVisual>();
 
             urdfVisual.GeometryType = UrdfGeometryRuntime.GetGeometryType(visual.geometry);
-            UrdfGeometryVisualRuntime.Create(visualObject.transform, urdfVisual.GeometryType, visual.geometry);
+            UrdfGeometryVisualRuntime.Create(visualObject.transform, urdfVisual.GeometryType, visual.geometry, useColliderInVisuals);
 
             if (useUrdfMaterials) {
                 UrdfMaterialRuntime.SetUrdfMaterial(visualObject, visual.material);
             }
 
             UrdfOrigin.ImportOriginData(visualObject.transform, visual.origin);
-        }
-
-        public static void AddCorrespondingCollision(this UrdfVisual urdfVisual) {
-            UrdfCollisions collisions = urdfVisual.GetComponentInParent<UrdfLink>().GetComponentInChildren<UrdfCollisions>();
-            UrdfCollisionExtensionsRuntime.Create(collisions.transform, urdfVisual.GeometryType, urdfVisual.transform);
         }
     }
 }

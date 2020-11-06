@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace RosSharp.Urdf.Runtime {
     public class UrdfGeometryVisualRuntime : UrdfGeometryRuntime {
-        public static void Create(Transform parent, GeometryTypes geometryType, Link.Geometry geometry = null) {
+        public static void Create(Transform parent, GeometryTypes geometryType, Link.Geometry geometry = null, bool useColliderInVisuals = false) {
             GameObject geometryGameObject = null;
 
             switch (geometryType) {
@@ -22,7 +22,7 @@ namespace RosSharp.Urdf.Runtime {
                     break;
                 case GeometryTypes.Mesh:
                     if (geometry != null)
-                        geometryGameObject = CreateMeshVisual(geometry.mesh);
+                        geometryGameObject = CreateMeshVisual(geometry.mesh, useColliderInVisuals);
                     //else, let user add their own mesh gameObject
                     break;
             }
@@ -34,8 +34,8 @@ namespace RosSharp.Urdf.Runtime {
             }
         }
 
-        private static GameObject CreateMeshVisual(Link.Geometry.Mesh mesh) {
-            GameObject meshObject = UrdfAssetImporterRuntime.Instance.ImportUrdfAsset(mesh.filename);
+        private static GameObject CreateMeshVisual(Link.Geometry.Mesh mesh, bool useColliderInVisuals = false) {
+            GameObject meshObject = UrdfAssetImporterRuntime.Instance.ImportUrdfAsset(mesh.filename, useColliderInVisuals);
             return meshObject;
         }
     }

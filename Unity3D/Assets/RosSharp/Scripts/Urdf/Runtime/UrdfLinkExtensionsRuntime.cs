@@ -4,16 +4,22 @@ using UnityEngine;
 
 namespace RosSharp.Urdf.Runtime {
     public static class UrdfLinkExtensionsRuntime {
-        public static UrdfLink Create(Transform parent, Link link = null, Joint joint = null, bool useUrdfMaterials = false) {
+        public static UrdfLink Create(Transform parent, Link link = null, Joint joint = null, bool useColliderInVisuals = false, bool useUrdfMaterials = false) {
             GameObject linkObject = new GameObject("link");
             linkObject.transform.SetParentAndAlign(parent);
             UrdfLink urdfLink = linkObject.AddComponent<UrdfLink>();
 
-            UrdfVisualsExtensionsRuntime.Create(linkObject.transform, link?.visuals, useUrdfMaterials);
-            UrdfCollisionsExtensionsRuntime.Create(linkObject.transform, link?.collisions, link?.visuals);
+            // If useColliderInVisuals is set to true, colliders will be added as duplicates of MeshRenderer into Visuals
+            UrdfVisualsExtensionsRuntime.Create(linkObject.transform, link?.visuals, useColliderInVisuals:useColliderInVisuals, useUrdfMaterials:useUrdfMaterials);
+
+            // Import colliders into Collisions GameObject only if useColliderInVisuals set to false,
+            // otherwise colliders will be imported as duplication of MeshRenderer in Visuals
+            if (!useColliderInVisuals) {
+                UrdfCollisionsExtensionsRuntime.Create(linkObject.transform, link?.collisions);
+            }
 
             if (link != null)
-                urdfLink.ImportLinkData(link, joint);
+                urdfLink.ImportLinkData(link, joint, useColliderInVisuals, useUrdfMaterials);
             else {
                 UrdfInertial.Create(linkObject);
             }
@@ -21,7 +27,7 @@ namespace RosSharp.Urdf.Runtime {
             return urdfLink;
         }
 
-        private static void ImportLinkData(this UrdfLink urdfLink, Link link, Joint joint) {
+        private static void ImportLinkData(this UrdfLink urdfLink, Link link, Joint joint, bool useColliderInVisuals = false, bool useUrdfMaterials = false) {
             if (link.inertial == null && joint == null)
                 urdfLink.IsBaseLink = true;
 
@@ -41,7 +47,7 @@ namespace RosSharp.Urdf.Runtime {
 
             foreach (Joint childJoint in link.joints) {
                 Link child = childJoint.ChildLink;
-                UrdfLinkExtensionsRuntime.Create(urdfLink.transform, child, childJoint);
+                UrdfLinkExtensionsRuntime.Create(urdfLink.transform, child, childJoint, useColliderInVisuals, useUrdfMaterials);
             }
         }
     }
